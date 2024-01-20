@@ -23,13 +23,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  // User.findById("65aa36fcfb59b56b22cdc9c6")
-  //   .then((user) => {
-  //     req.user = new User(user.name, user.email, user.cart, user._id);
-  //     next();
-  //   })
-  //   .catch((err) => console.log(err));
-  next();
+  User.findById("65abba9dc5ee8db00bc1d093")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
 });
 
 app.use("/admin", adminRoutes);
@@ -38,8 +37,22 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 mongoose
-  .connect("mongodb+srv://bhuvaneshhj:Bhuvi@cluster0.fghogsf.mongodb.net/noSQL?retryWrites=true&w=majority")
+  .connect(
+    "mongodb+srv://bhuvaneshhj:Bhuvi@cluster0.fghogsf.mongodb.net/noSQL?retryWrites=true&w=majority"
+  )
   .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "Bhuvanesh",
+          email: "bhuvanesh@gmail.com",
+          cart: {
+            items: [],
+          },
+        });
+        user.save();
+      }
+    });
     app.listen(3000);
   })
   .catch((err) => {

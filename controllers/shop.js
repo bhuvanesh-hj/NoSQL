@@ -38,7 +38,10 @@ exports.getProduct = (req, res, next) => {
 
 exports.getIndex = (req, res, next) => {
   Product.find()
+  // .select("-imageURL")
+  // .populate("userId", "name")
     .then((products) => {
+      // console.log(products);
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
@@ -52,8 +55,17 @@ exports.getIndex = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then((products) => {
+    .populate("cart.items.productId")
+    .then((user) => {
+      // console.log(user.cart.items);
+      let products = user.cart.items.map(item=>{
+        return {
+          _id:item.productId._id,
+          title: item.productId.title,
+          description: item.productId.description,
+          quantity: item.quantity
+        }
+      });
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
